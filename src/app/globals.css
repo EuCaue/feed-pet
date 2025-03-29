@@ -124,3 +124,9 @@
 button {
   cursor: pointer;
 }
+
+.hover-btn {
+  &:hover {
+    @apply shadow shadow-accent-foreground translate-y-0.5;
+  }
+}

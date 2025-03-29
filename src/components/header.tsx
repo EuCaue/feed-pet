@@ -32,7 +32,7 @@ export default function Header() {
               <span className="flex gap-2">
                 <ModeToggle />
                 {isLoggedIn && (
-                  <Button variant="default" size={"icon"}>
+                  <Button variant="default" size={"icon"} className="hover-btn">
                     <LogInIcon />
                   </Button>
                 )}

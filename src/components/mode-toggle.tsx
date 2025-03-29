@@ -30,7 +30,7 @@ export default function ModeToggle() {
   }
 
   return (
-    <Button onClick={() => changeColorScheme(theme)}>
+    <Button onClick={() => changeColorScheme(theme)} className="hover-btn">
       <CurrentColorSchemeIcon colorscheme={theme} />
     </Button>
   );
