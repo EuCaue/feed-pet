@@ -9,12 +9,21 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const isLoggedIn: boolean = true;
   const isMobile = useMobile();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null ;
+
   return (
-    <div className="flex justify-between items-center min-w-[85vw] px-5 py-5 bg-accent">
+    <header className="flex justify-between items-center min-w-[85vw] px-5 py-5 bg-accent sticky top-0">
       <Link href="/">
         <CatIcon size={28} />
       </Link>
@@ -55,6 +64,6 @@ export default function Header() {
           </span>
         </>
       )}
-    </div>
+    </header>
   );
 }
