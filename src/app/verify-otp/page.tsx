@@ -78,7 +78,7 @@ export default function VerifyOtp() {
   const seconds = ((timeLeft % 60000) / 1000).toFixed(0);
 
   return (
-    <Center as="main">
+    <Center as="main" className="h-screen">
       <Card className="w-[350px] h-[350px] flex items-center justify-between flex-col">
         <CardHeader className="w-full flex flex-col items-center text-center justify-center gap-7">
           <CardTitle>Verification Code</CardTitle>
@@ -103,7 +103,7 @@ export default function VerifyOtp() {
           </Center>
         </CardContent>
         <CardFooter>
-          <Center className="h-auto relative">
+          <Center className="relative">
             <Button
               className="hover-btn flex-0"
               variant={"default"}

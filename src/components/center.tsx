@@ -16,7 +16,7 @@ export default function Center<T extends React.ElementType = "div">({
 
   return (
     <Component
-      className={cn("flex h-screen items-center justify-center", className)}
+      className={cn("flex h-auto items-center justify-center", className)}
       {...props}
     >
       {children}

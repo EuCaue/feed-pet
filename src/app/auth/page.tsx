@@ -26,27 +26,27 @@ import Center from "@/components/center";
 
 export default function Auth() {
   const router = useRouter();
-  const formSchema = z.object({
+  const authSchema = z.object({
     email: z.string().email({
       message: "Email not valid!",
     }),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof authSchema>>({
+    resolver: zodResolver(authSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof authSchema>) {
     console.log(values);
     // await for the otp code to be sent...
     router.push("/verify-otp");
   }
 
   return (
-    <Center as="main">
+    <Center as="main" className="h-screen">
       <Card className="w-[350px]">
         <CardHeader className="text-center">
           <CardTitle>Feed Pet</CardTitle>
