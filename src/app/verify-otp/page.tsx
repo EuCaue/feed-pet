@@ -28,14 +28,21 @@ import { useRouter } from "next/navigation";
 type OTPInputProps = {
   otpValue: string;
   setOtpValue: (newOtpValue: string) => void;
+  OTPCODE: string;
 };
 
-function OTPInput({ otpValue, setOtpValue }: OTPInputProps) {
+function OTPInput({ otpValue, setOtpValue, OTPCODE }: OTPInputProps) {
+  const router = useRouter();
   return (
     <InputOTP
       maxLength={6}
       value={otpValue}
-      onChange={(value) => setOtpValue(value)}
+      onChange={(value) => {
+        setOtpValue(value);
+        if (value === OTPCODE) {
+          router.push("/account-settings");
+        }
+      }}
     >
       <InputOTPGroup>
         <InputOTPSlot index={0} className="w-11 h-11 text-2xl" />
@@ -83,12 +90,17 @@ export default function VerifyOtp() {
         <CardHeader className="w-full flex flex-col items-center text-center justify-center gap-7">
           <CardTitle>Verification Code</CardTitle>
           <CardDescription>
-            Verification code has been sent to <span className="font-bold">useremail@example.com</span>
+            Verification code has been sent to{" "}
+            <span className="font-bold">useremail@example.com</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Center className="h-auto flex-col gap-2.5">
-            <OTPInput setOtpValue={setOtpValue} otpValue={otpValue} />
+          <Center className="flex-col gap-2.5">
+            <OTPInput
+              setOtpValue={setOtpValue}
+              otpValue={otpValue}
+              OTPCODE={otpCode}
+            />
             <span
               style={{
                 display:
@@ -110,7 +122,7 @@ export default function VerifyOtp() {
               disabled={otpValue.length < 6}
               onClick={() => {
                 if (otpValue === otpCode) {
-                  router.push("/user");
+                  router.push("/account-settings");
                 }
               }}
             >
