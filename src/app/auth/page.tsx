@@ -21,11 +21,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowRightIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Center from "@/components/center";
+import { signIn } from "./actions";
 
-export default function Auth() {
+export default function Auth({}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message") ?? "";
   const authSchema = z.object({
     email: z.string().email({
       message: "Email not valid!",
@@ -38,11 +41,14 @@ export default function Auth() {
       email: "",
     },
   });
-
-  function onSubmit(values: z.infer<typeof authSchema>) {
-    console.log(values);
-    // await for the otp code to be sent...
-    router.push("/verify-otp");
+  form.setError("email", { message: message });
+  async function onSubmit({ email }: z.infer<typeof authSchema>) {
+    try {
+      const response = await signIn({ email });
+      router.push(response.url);
+    } catch (e) {
+      console.error("Error while sign in", e);
+    }
   }
 
   return (
