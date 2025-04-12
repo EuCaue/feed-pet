@@ -20,15 +20,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Center from "@/components/center";
 import { signIn } from "./actions";
+import { useEffect, useState } from "react";
 
 export default function Auth({}) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const searchParams = useSearchParams();
-  const message = searchParams.get("message") ?? "";
+  const message = searchParams.get("message") ?? undefined;
   const authSchema = z.object({
     email: z.string().email({
       message: "Email not valid!",
@@ -41,13 +43,25 @@ export default function Auth({}) {
       email: "",
     },
   });
-  form.setError("email", { message: message });
+
+  useEffect(() => {
+    if (message) {
+      form.setError("email", {
+        type: "manual",
+        message,
+      });
+    }
+  }, [message, form]);
+
   async function onSubmit({ email }: z.infer<typeof authSchema>) {
+    setIsLoading(true);
     try {
       const response = await signIn({ email });
       router.push(response.url);
     } catch (e) {
       console.error("Error while sign in", e);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -82,8 +96,14 @@ export default function Auth({}) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="hover-btn">
-                Enter <ArrowRightIcon />{" "}
+              <Button type="submit" className="hover-btn" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2Icon className="animate-spin"/>
+                ) : (
+                  <>
+                    Enter <ArrowRightIcon />
+                  </>
+                )}
               </Button>
             </form>
           </Form>
