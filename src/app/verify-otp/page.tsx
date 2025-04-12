@@ -15,7 +15,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { CheckIcon, RefreshCwIcon } from "lucide-react";
+import { CheckIcon, Loader2Icon, RefreshCwIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -23,25 +23,24 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { verifyOTP } from "./actions";
+import { signIn } from "../auth/actions";
 
 type OTPInputProps = {
   otpValue: string;
   setOtpValue: (newOtpValue: string) => void;
-  OTPCODE: string;
+  callback: CallableFunction;
 };
 
-function OTPInput({ otpValue, setOtpValue, OTPCODE }: OTPInputProps) {
-  const router = useRouter();
+function OTPInput({ otpValue, setOtpValue, callback: cb }: OTPInputProps) {
   return (
     <InputOTP
       maxLength={6}
       value={otpValue}
       onChange={(value) => {
+        if (value.length === 6) cb();
         setOtpValue(value);
-        if (value === OTPCODE) {
-          router.push("/account-settings");
-        }
       }}
     >
       <InputOTPGroup>
@@ -59,30 +58,66 @@ function OTPInput({ otpValue, setOtpValue, OTPCODE }: OTPInputProps) {
 }
 
 export default function VerifyOtp() {
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const initialResendOtpTime = 60;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(initialResendOtpTime);
   const [resendOtp, setResendOtp] = useState<boolean>(false);
   const [otpValue, setOtpValue] = useState<string>("");
   const router = useRouter();
-  const otpCode = "932012";
+  const searchParams = useSearchParams();
+  const errorMessage = searchParams.get("message");
+  const email = searchParams.get("email")!;
+  useEffect(() => {
+    if (!email) {
+      router.push("/auth");
+    }
+  }, [email, router]);
 
   useEffect(() => {
-    setTimeLeft(60000);
-
-    const intervalId = setInterval(() => {
-      setTimeLeft((prev) => {
-        const newTime = Math.max(prev - 1000, 0);
-        if (newTime === 0) {
+    const intervalID = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime === 0) {
+          clearInterval(intervalID);
           setResendOtp(false);
+          return initialResendOtpTime;
+        } else {
+          return prevTime - 1;
         }
-        return newTime;
       });
     }, 1000);
+    return () => {
+      clearInterval(intervalID);
+    };
+  }, [resendOtp, timeLeft]);
 
-    return () => clearInterval(intervalId);
-  }, [resendOtp]);
+  async function handleVerifyOTP(): Promise<void> {
+    setIsLoading(true);
+    try {
+      const response = await verifyOTP({
+        email,
+        token: otpValue,
+      });
+      router.push(response.url);
+    } catch (e) {
+      console.error("Error while verifying the OTP", e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  async function handleResendOTP() {
+    setResendOtp(true);
+    console.log("resent");
+    try {
+      await signIn({
+        email,
+      });
+    } catch (e) {
+      console.error("Error while sign in", e);
+    }
+  }
 
-  const minutes = Math.floor(timeLeft / 60000);
-  const seconds = ((timeLeft % 60000) / 1000).toFixed(0);
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
 
   return (
     <Center as="main" className="h-screen">
@@ -91,7 +126,7 @@ export default function VerifyOtp() {
           <CardTitle>Verification Code</CardTitle>
           <CardDescription>
             Verification code has been sent to{" "}
-            <span className="font-bold">useremail@example.com</span>
+            <span className="font-bold">{email}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -99,14 +134,11 @@ export default function VerifyOtp() {
             <OTPInput
               setOtpValue={setOtpValue}
               otpValue={otpValue}
-              OTPCODE={otpCode}
+              callback={handleVerifyOTP}
             />
             <span
               style={{
-                display:
-                  otpValue !== otpCode && otpValue.length === 6
-                    ? "inline"
-                    : "none",
+                display: errorMessage ? "inline" : "none",
               }}
               className="text-destructive text-sm text-center justify-end self-center font-medium"
             >
@@ -120,13 +152,15 @@ export default function VerifyOtp() {
               className="hover-btn flex-0"
               variant={"default"}
               disabled={otpValue.length < 6}
-              onClick={() => {
-                if (otpValue === otpCode) {
-                  router.push("/account-settings");
-                }
-              }}
+              onClick={handleVerifyOTP}
             >
-              <CheckIcon /> Confirm
+              {isLoading ? (
+                <Loader2Icon className="animate-spin" />
+              ) : (
+                <>
+                  <CheckIcon /> Confirm
+                </>
+              )}
             </Button>
             <TooltipProvider>
               <Tooltip>
@@ -137,7 +171,7 @@ export default function VerifyOtp() {
                       size={"sm"}
                       disabled={resendOtp}
                       className="flex-1 text-sm"
-                      onClick={() => setResendOtp(true)}
+                      onClick={handleResendOTP}
                     >
                       <RefreshCwIcon />
                     </Button>
