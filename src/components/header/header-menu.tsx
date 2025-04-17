@@ -27,6 +27,11 @@ function Items({ username }: { username: string | null }) {
       <ModeToggle />
       {username && (
         <>
+          <Button asChild className="hover-btn">
+            <Link href="/account-settings">
+              <User2Icon />
+            </Link>
+          </Button>
           <form action="/api/auth/signout" method="post">
             <Button
               variant="default"
@@ -38,11 +43,6 @@ function Items({ username }: { username: string | null }) {
               <LogInIcon />
             </Button>
           </form>
-          <Button asChild>
-            <Link href="/account-settings">
-              <User2Icon />
-            </Link>
-          </Button>
         </>
       )}
     </>
