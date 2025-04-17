@@ -1,5 +1,5 @@
-"use server"
-import { LogInIcon, MenuIcon } from "lucide-react";
+"use server";
+import { LogInIcon, MenuIcon, User2Icon } from "lucide-react";
 import { Button } from "@components/ui/button";
 import ModeToggle from "@/components/mode-toggle";
 import {
@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 type HeaderMenuProps = {
   username: string | null;
   isMobile: boolean;
@@ -20,7 +21,38 @@ function Greeting({ username }: { username: string | null }) {
   );
 }
 
-export default async function HeaderMenu({ username,isMobile }: HeaderMenuProps) {
+function Items({ username }: { username: string | null }) {
+  return (
+    <>
+      <ModeToggle />
+      {username && (
+        <>
+          <form action="/api/auth/signout" method="post">
+            <Button
+              variant="default"
+              size="icon"
+              title="Sign out"
+              type="submit"
+              className="hover-btn"
+            >
+              <LogInIcon />
+            </Button>
+          </form>
+          <Button asChild>
+            <Link href="/account-settings">
+              <User2Icon />
+            </Link>
+          </Button>
+        </>
+      )}
+    </>
+  );
+}
+
+export default async function HeaderMenu({
+  username,
+  isMobile,
+}: HeaderMenuProps) {
   return (
     <>
       {isMobile ? (
@@ -32,12 +64,7 @@ export default async function HeaderMenu({ username,isMobile }: HeaderMenuProps)
             <div className="flex items-center justify-between flex-col min-h-fit p-4">
               <Greeting username={username} />
               <span className="flex gap-2">
-                <ModeToggle />
-                {username && (
-                  <Button variant="default" size="icon" className="hover-btn">
-                    <LogInIcon />
-                  </Button>
-                )}
+                <Items username={username} />
               </span>
             </div>
           </DropdownMenuContent>
@@ -46,20 +73,7 @@ export default async function HeaderMenu({ username,isMobile }: HeaderMenuProps)
         <>
           <Greeting username={username} />
           <span className="flex gap-2">
-            <ModeToggle />
-            {username && (
-              <form action="/api/auth/signout" method="post">
-                <Button
-                  variant="default"
-                  size="icon"
-                  title="Sign out"
-                  type="submit"
-                  className="hover-btn"
-                >
-                  <LogInIcon />
-                </Button>
-              </form>
-            )}
+            <Items username={username} />
           </span>
         </>
       )}
