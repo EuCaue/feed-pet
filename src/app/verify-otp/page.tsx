@@ -27,6 +27,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { verifyOTP } from "./actions";
 import { signIn } from "../auth/actions";
 
+const INITIAL_RESEND_OTP_TIME = 60;
 type OTPInputProps = {
   otpValue: string;
   setOtpValue: (newOtpValue: string) => void;
@@ -39,8 +40,8 @@ function OTPInput({ otpValue, setOtpValue, callback: cb }: OTPInputProps) {
       maxLength={6}
       value={otpValue}
       onChange={(value) => {
-        if (value.length === 6) cb();
         setOtpValue(value);
+        if (value.length === 6) cb({ token: value });
       }}
     >
       <InputOTPGroup>
@@ -58,9 +59,8 @@ function OTPInput({ otpValue, setOtpValue, callback: cb }: OTPInputProps) {
 }
 
 export default function VerifyOtp() {
-  const initialResendOtpTime = 60;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState<number>(initialResendOtpTime);
+  const [timeLeft, setTimeLeft] = useState<number>(INITIAL_RESEND_OTP_TIME);
   const [resendOtp, setResendOtp] = useState<boolean>(false);
   const [otpValue, setOtpValue] = useState<string>("");
   const router = useRouter();
@@ -79,7 +79,7 @@ export default function VerifyOtp() {
         if (prevTime === 0) {
           clearInterval(intervalID);
           setResendOtp(false);
-          return initialResendOtpTime;
+          return INITIAL_RESEND_OTP_TIME;
         } else {
           return prevTime - 1;
         }
@@ -90,12 +90,14 @@ export default function VerifyOtp() {
     };
   }, [resendOtp, timeLeft]);
 
-  async function handleVerifyOTP(): Promise<void> {
+  async function handleVerifyOTP({ token }: { token: string }): Promise<void> {
     setIsLoading(true);
     try {
+      console.log(token);
       const response = await verifyOTP({
         email,
-        token: otpValue,
+        token,
+        currentUrl: window.location.href
       });
       router.push(response.url);
     } catch (e) {
@@ -106,7 +108,6 @@ export default function VerifyOtp() {
   }
   async function handleResendOTP() {
     setResendOtp(true);
-    console.log("resent");
     try {
       await signIn({
         email,
@@ -151,8 +152,8 @@ export default function VerifyOtp() {
             <Button
               className="hover-btn flex-0"
               variant={"default"}
-              disabled={otpValue.length < 6}
-              onClick={handleVerifyOTP}
+              disabled={otpValue.length < 6 || isLoading}
+              onClick={() => handleVerifyOTP({ token: otpValue })}
             >
               {isLoading ? (
                 <Loader2Icon className="animate-spin" />
@@ -169,7 +170,7 @@ export default function VerifyOtp() {
                     <Button
                       variant={"link"}
                       size={"sm"}
-                      disabled={resendOtp}
+                      disabled={resendOtp || isLoading}
                       className="flex-1 text-sm"
                       onClick={handleResendOTP}
                     >
