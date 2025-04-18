@@ -23,12 +23,13 @@ const accountSchema = z.object({
   name: z
     .string()
     .min(4, { message: "Name must be at least 4 characters long." })
-    .max(255, { message: "Name can be a maximum of 255 characters long." }),
+    .max(255, { message: "Name can be a maximum of 255 characters long." })
+    .optional(),
 });
 
 type User = {
   email: string;
-  name: string;
+  name?: string;
 };
 
 type ClientAccountFormProps = {
@@ -45,7 +46,7 @@ const DEFAULT_BACKEND_RESPONSE: BackendResponse = {
   message: "",
 };
 export default function ClientAccountForm({ user }: ClientAccountFormProps) {
-  const hasName = user.name.length > 0;
+  const hasName = user?.name?.length ? user.name.length > 0 : 0;
   const router = useRouter();
   const [backendResponse, setBackendResponse] = useState<BackendResponse>(
     DEFAULT_BACKEND_RESPONSE,
@@ -58,10 +59,11 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
     mode: "onChange",
   });
 
-  async function onSubmit(values: z.infer<typeof accountSchema>) {
+  async function onSubmit({ email, name }: z.infer<typeof accountSchema>) {
+    if (!name) return;
     setIsLoading(true);
     setBackendResponse(DEFAULT_BACKEND_RESPONSE);
-    const result = await saveAccountSettings(values);
+    const result = await saveAccountSettings({ email, name });
     setBackendResponse({
       hasError: !result.success,
       message: result.message,
