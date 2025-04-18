@@ -1,5 +1,5 @@
 "use server";
-import { LogInIcon, MenuIcon, User2Icon } from "lucide-react";
+import { CatIcon, LogInIcon, MenuIcon, User2Icon } from "lucide-react";
 import { Button } from "@components/ui/button";
 import ModeToggle from "@/components/mode-toggle";
 import {
@@ -8,7 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+
 type HeaderMenuProps = {
+  isLoggedIn: boolean;
   username: string | null;
   isMobile: boolean;
 };
@@ -16,16 +18,20 @@ type HeaderMenuProps = {
 function Greeting({ username }: { username: string | null }) {
   return (
     <p className="font-bold font-mono leading-loose text-sm">
-      Hey, {username} how it&apos;s going today?
+      Hey,
+      <Button asChild type="button" variant={"link"} size={'sm'}>
+        <Link href="/account-settings">{username}</Link>
+      </Button>
+      how it&apos;s going today?
     </p>
   );
 }
 
-function Items({ username }: { username: string | null }) {
+function Items({ isLoggedIn }: Pick<HeaderMenuProps, "isLoggedIn">) {
   return (
     <>
       <ModeToggle />
-      {username && (
+      {isLoggedIn && (
         <>
           <Button asChild className="hover-btn">
             <Link href="/account-settings">
@@ -48,13 +54,22 @@ function Items({ username }: { username: string | null }) {
     </>
   );
 }
+function Logo({ isLoggedIn }: Pick<HeaderMenuProps, "isLoggedIn">) {
+  return (
+    <Link href={isLoggedIn ? "/app" : "/"}>
+      <CatIcon size={28} />
+    </Link>
+  );
+}
 
 export default async function HeaderMenu({
+  isLoggedIn,
   username,
   isMobile,
 }: HeaderMenuProps) {
   return (
     <>
+      <Logo isLoggedIn={isLoggedIn} />
       {isMobile ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -64,7 +79,7 @@ export default async function HeaderMenu({
             <div className="flex items-center justify-between flex-col min-h-fit p-4">
               <Greeting username={username} />
               <span className="flex gap-2">
-                <Items username={username} />
+                <Items isLoggedIn={isLoggedIn} />
               </span>
             </div>
           </DropdownMenuContent>
@@ -73,7 +88,7 @@ export default async function HeaderMenu({
         <>
           <Greeting username={username} />
           <span className="flex gap-2">
-            <Items username={username} />
+            <Items isLoggedIn={isLoggedIn} />
           </span>
         </>
       )}
