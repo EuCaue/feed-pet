@@ -2,32 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Center from "@/components/center";
 import ClientAccountForm from "./client-account-form";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 
 export default async function AccountSettings() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/");
-  }
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name, email")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) {
-    redirect("/");
-  }
+  if (!user) redirect("/");
 
   const userData = {
-    email: profile.email,
-    name: profile.name,
+    email: user.email,
+    name: user.name as string | undefined,
   };
 
   return (
