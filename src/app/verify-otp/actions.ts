@@ -36,9 +36,12 @@ export const verifyOTP = async ({ email, token, currentUrl }: VerifyOTP) => {
   } = await supabase.auth.getUser();
 
   if (getUserError || !user) {
+    const url = new URL(currentUrl, "http://localhost"); // host dummy só pra usar o URL
+    url.searchParams.set("message", "Could not authenticate user");
     return {
       success: false,
       message: "User not found.",
+      url: url.pathname + "?" + url.searchParams.toString(),
     };
   }
 
