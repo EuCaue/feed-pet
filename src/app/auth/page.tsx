@@ -1,112 +1,30 @@
-"use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import Center from "@/components/center";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { ArrowRightIcon, Loader2Icon } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Center from "@/components/center";
-import { signIn } from "./actions";
-import { useEffect, useState } from "react";
+import AuthForm from "./auth-form";
+import getCurrentUser from "@/lib/supabase/queries/get-current-user";
+import { redirect } from "next/navigation";
 
-export default function Auth({}) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message") ?? undefined;
-  const authSchema = z.object({
-    email: z.string().email({
-      message: "Email not valid!",
-    }),
-  });
-
-  const form = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  useEffect(() => {
-    if (message) {
-      form.setError("email", {
-        type: "manual",
-        message,
-      });
-    }
-  }, [message, form]);
-
-  async function onSubmit({ email }: z.infer<typeof authSchema>) {
-    setIsLoading(true);
-    try {
-      const response = await signIn({ email });
-      router.push(response.url);
-    } catch (e) {
-      console.error("Error while sign in", e);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+export default async function Auth() {
+  const user = await getCurrentUser();
+  if (user) redirect("/app");
 
   return (
     <Center as="main" className="h-screen">
       <Card className="w-[350px]">
         <CardHeader className="text-center">
           <CardTitle>Feed Pet</CardTitle>
-          <CardDescription className="">
-            Remeber to always pet your pet too!
+          <CardDescription>
+            Remember to always pet your pet too!
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 text-center"
-            >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="someemailhere@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="hover-btn" disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="animate-spin"/>
-                ) : (
-                  <>
-                    Enter <ArrowRightIcon />
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
+          <AuthForm />
         </CardContent>
       </Card>
     </Center>
