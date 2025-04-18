@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
+import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 
-export default function Home() {
-  const isLoggedIn = false;
+export default async function Home() {
+  const user = await getCurrentUser();
 
   return (
     <div className="min-w-[100vw] min-h-[100vh] flex flex-col items-center justify-center gap-5">
@@ -12,7 +13,7 @@ export default function Home() {
         Never forget when to feed your pet again
       </h2>
       <Button asChild variant={"default"} className="hover-btn">
-        <Link href={isLoggedIn ? "/app" : "/auth"}>
+        <Link href={user ? "/app" : "/auth"}>
           Get started <ArrowRightIcon size={24} />
         </Link>
       </Button>
