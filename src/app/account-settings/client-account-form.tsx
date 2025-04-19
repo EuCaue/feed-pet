@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, Loader2Icon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import { saveAccountSettings } from "./actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loading } from "@/components/loading";
 
 const accountSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -123,7 +124,7 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
           }
         >
           {isLoading ? (
-            <Loader2Icon className="animate-spin" />
+            <Loading>Updating...</Loading>
           ) : (
             <>
               {hasName ? "Update" : "Update and Go to the App"} <CheckIcon />

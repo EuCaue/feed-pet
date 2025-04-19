@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { verifyOTP } from "./actions";
 import { signIn } from "../auth/actions";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, Loader2Icon, RefreshCwIcon } from "lucide-react";
+import { CheckIcon, RefreshCwIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -19,6 +19,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Loading } from "@/components/loading";
 
 const INITIAL_RESEND_OTP_TIME = 60;
 
@@ -68,13 +69,12 @@ export default function OtpForm({
 
   async function handleResendOTP() {
     setResendOtp(true);
-    console.log("reseding otp",email);
+    console.log("reseding otp", email);
     try {
-    await signIn({ email });
+      await signIn({ email });
     } catch (error) {
-      console.error("Error while resend OTP code.", JSON.stringify(error))
-  }
-      
+      console.error("Error while resend OTP code.", JSON.stringify(error));
+    }
   }
 
   return (
@@ -123,7 +123,7 @@ export default function OtpForm({
             className="hover-btn flex-0"
           >
             {isLoading ? (
-              <Loader2Icon className="animate-spin" />
+              <Loading position="right">Confirming...</Loading>
             ) : (
               <>
                 <CheckIcon /> Confirm

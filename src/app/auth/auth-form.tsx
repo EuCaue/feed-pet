@@ -15,8 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ArrowRightIcon, Loader2Icon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { signIn } from "./actions";
+import { Loading } from "@/components/loading";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Email not valid!" }),
@@ -71,7 +72,9 @@ export default function AuthForm() {
         />
         <Button type="submit" className="hover-btn" disabled={isLoading}>
           {isLoading ? (
-            <Loader2Icon className="animate-spin" />
+            <Loading position="right">
+              Loading...
+            </Loading>
           ) : (
             <>
               Enter <ArrowRightIcon />

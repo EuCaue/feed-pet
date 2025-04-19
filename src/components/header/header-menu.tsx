@@ -1,5 +1,5 @@
 "use server";
-import { CatIcon, LogInIcon, MenuIcon, User2Icon } from "lucide-react";
+import { LogInIcon, MenuIcon, User2Icon } from "lucide-react";
 import { Button } from "@components/ui/button";
 import ModeToggle from "@/components/mode-toggle";
 import {
@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import signOut from "./actions";
 
 type HeaderMenuProps = {
   isLoggedIn: boolean;
@@ -19,8 +20,8 @@ function Greeting({ username }: { username: string | null }) {
   return (
     <p className="font-bold font-mono leading-loose text-sm">
       Hey,
-      <Button asChild type="button" variant={"link"} size={'sm'}>
-        <Link href="/account-settings">{username}</Link>
+      <Button asChild type="button" variant={"link"} size={"sm"}>
+        {username ? <Link href="/account-settings">{username}</Link> : null}
       </Button>
       how it&apos;s going today?
     </p>
@@ -54,13 +55,6 @@ function Items({ isLoggedIn }: Pick<HeaderMenuProps, "isLoggedIn">) {
     </>
   );
 }
-function Logo({ isLoggedIn }: Pick<HeaderMenuProps, "isLoggedIn">) {
-  return (
-    <Link href={isLoggedIn ? "/app" : "/"}>
-      <CatIcon size={28} />
-    </Link>
-  );
-}
 
 export default async function HeaderMenu({
   isLoggedIn,
@@ -69,7 +63,6 @@ export default async function HeaderMenu({
 }: HeaderMenuProps) {
   return (
     <>
-      <Logo isLoggedIn={isLoggedIn} />
       {isMobile ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
