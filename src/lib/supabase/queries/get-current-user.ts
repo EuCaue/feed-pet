@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
+type User = {
+  email: string;
+  name: string;
+}
+
 export default async function getCurrentUser() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -14,6 +19,7 @@ export default async function getCurrentUser() {
     .from("profiles")
     .select("name, email")
     .eq("id", user!.id)
-    .single();
+    .single()
+    .overrideTypes<User>();
   return profile;
 }
