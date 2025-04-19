@@ -38,7 +38,7 @@ function Items({ isLoggedIn }: Pick<HeaderMenuProps, "isLoggedIn">) {
               <User2Icon />
             </Link>
           </Button>
-          <form action="/api/auth/signout" method="post">
+          <form action={signOut}>
             <Button
               variant="default"
               size="icon"
