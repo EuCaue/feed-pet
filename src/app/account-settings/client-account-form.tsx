@@ -18,6 +18,7 @@ import { saveAccountSettings } from "./actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loading } from "@/components/loading";
+import { toast } from "sonner";
 
 const accountSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -74,6 +75,10 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
       router.push("/app");
       return;
     }
+    toast("Update Status", {
+      description: result.message,
+      closeButton: true,
+    });
     setTimeout(() => {
       form.reset(result.success ? form.getValues() : undefined);
       setBackendResponse(DEFAULT_BACKEND_RESPONSE);
