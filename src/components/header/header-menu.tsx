@@ -12,16 +12,16 @@ import signOut from "./actions";
 
 type HeaderMenuProps = {
   isLoggedIn: boolean;
-  username: string | null;
+  username?: string;
   isMobile: boolean;
 };
 
-function Greeting({ username }: { username: string | null }) {
+function Greeting({ username }: { username?: string }) {
   return (
     <p className="font-bold font-mono leading-loose text-sm">
       Hey,
       <Button asChild type="button" variant={"link"} size={"sm"}>
-        {username ? <Link href="/account-settings">{username}</Link> : null}
+        <Link href={username ? "/account-settings" : "/"}>{username}</Link>
       </Button>
       how it&apos;s going today?
     </p>
