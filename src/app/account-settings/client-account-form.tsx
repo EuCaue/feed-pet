@@ -19,6 +19,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loading } from "@/components/loading";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import Center from "@/components/center";
 
 const accountSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -27,11 +29,13 @@ const accountSchema = z.object({
     .min(4, { message: "Name must be at least 4 characters long." })
     .max(255, { message: "Name can be a maximum of 255 characters long." })
     .optional(),
+  is_12h: z.boolean(),
 });
 
 type User = {
   email: string;
   name?: string;
+  is_12h: boolean;
 };
 
 type ClientAccountFormProps = {
@@ -61,11 +65,15 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
     mode: "onChange",
   });
 
-  async function onSubmit({ email, name }: z.infer<typeof accountSchema>) {
+  async function onSubmit({
+    email,
+    name,
+    is_12h,
+  }: z.infer<typeof accountSchema>) {
     if (!name) return;
     setIsLoading(true);
     setBackendResponse(DEFAULT_BACKEND_RESPONSE);
-    const result = await saveAccountSettings({ email, name });
+    const result = await saveAccountSettings({ email, name, is_12h });
     setBackendResponse({
       hasError: !result.success,
       message: result.message,
@@ -112,6 +120,36 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
               <FormLabel>Name:</FormLabel>
               <FormControl>
                 <Input placeholder="Anna" {...field} />
+              </FormControl>
+              <FormDescription>
+                {!hasName &&
+                  "I dont know your name yet, how should I call you?"}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="is_12h"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between p-4">
+              <FormLabel>Time Format:</FormLabel>
+              <FormControl>
+                <Center className="gap-4">
+                  <span className="">12h</span>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      form.setValue("is_12h", checked, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                        shouldTouch: true,
+                      });
+                    }}
+                  />
+                  <span>24h</span>
+                </Center>
               </FormControl>
               <FormDescription>
                 {!hasName &&

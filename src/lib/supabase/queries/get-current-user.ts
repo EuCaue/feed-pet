@@ -5,6 +5,7 @@ type User = {
   email: string;
   name: string;
   id: string;
+  is_12h: boolean;
 }
 
 export default async function getCurrentUser() {
@@ -18,7 +19,7 @@ export default async function getCurrentUser() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, email, id")
+    .select("name, email, id, is_12h")
     .eq("id", user!.id)
     .single()
     .overrideTypes<User>();

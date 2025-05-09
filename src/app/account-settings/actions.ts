@@ -11,6 +11,7 @@ type SaveAccountSettingsReturn = {
 export async function saveAccountSettings(data: {
   name: string;
   email: string;
+  is_12h: boolean;
 }): Promise<SaveAccountSettingsReturn> {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -43,7 +44,7 @@ export async function saveAccountSettings(data: {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, email")
+    .select("name, email, is_12h")
     .eq("id", user.id)
     .single();
 
@@ -54,17 +55,14 @@ export async function saveAccountSettings(data: {
     };
   }
 
-  if (profile.name !== data.name || profile.email !== data.email) {
+  if (JSON.stringify(profile) !== JSON.stringify(data)) {
     const { error: profileError } = await supabase
       .from("profiles")
-      .update({
-        name: data.name,
-        email: data.email,
-      })
+      .update(data)
       .eq("id", user.id);
-    console.log("PROFILE ERR", profileError);
 
     if (profileError) {
+      console.log("PROFILE ERR", profileError);
       return {
         success: false,
         message: "Error while updating profile.",

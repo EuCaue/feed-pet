@@ -12,6 +12,7 @@ export default async function AccountSettings() {
   const userData = {
     email: user.email,
     name: user.name as string | undefined,
+    is_12h: user.is_12h
   };
 
   return (
