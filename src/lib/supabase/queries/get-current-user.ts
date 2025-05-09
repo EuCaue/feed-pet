@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 type User = {
   email: string;
   name: string;
+  id: string;
 }
 
 export default async function getCurrentUser() {
@@ -17,7 +18,7 @@ export default async function getCurrentUser() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, email")
+    .select("name, email, id")
     .eq("id", user!.id)
     .single()
     .overrideTypes<User>();
