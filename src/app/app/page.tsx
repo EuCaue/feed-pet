@@ -29,6 +29,7 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import TimePicker from "@/components/time-picker";
 import DatePicker from "@/components/date-picker";
+import { addFeed } from "./actions";
 
 type FeedItemProps = {
   time: string;
@@ -42,23 +43,24 @@ const feedItemSchema = z.object({
 });
 
 function DialogAdd() {
+  //  TODO: make this close on submit 
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
     defaultValues: { description: "", date: new Date(), time: new Date() },
   });
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   async function onSubmit({
     description,
     date,
     time,
   }: z.infer<typeof feedItemSchema>) {
-    console.info(
-      "SUBMIT ============>",
-      description,
-      new Date(date).getTime(),
-      new Date(time).getTime(),
-    );
-    form.reset();
+    try {
+      await addFeed({ description, date, time });
+      form.reset();
+    } catch (err: unknown) {
+      setErrorMessage(err.message);
+    }
   }
   const isLoading = form.formState.isSubmitting;
 
@@ -70,68 +72,68 @@ function DialogAdd() {
         </Button>
       </DialogTrigger>
 
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-center">Register the time you feed your pet!</DialogTitle>
-          </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-center">
+            Register the time you feed your pet!
+          </DialogTitle>
+        </DialogHeader>
 
-          <Form {...form}>
-            <form
-              id="addForm"
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 text-center"
-            >
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description:</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Today, everyone has been fed without making a mess."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date:</FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="time"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time:</FormLabel>
-                    <FormControl>
-                      <TimePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                        use24Format={false}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
+        <Form {...form}>
+          <form
+            id="addForm"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 text-center"
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description:</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Today, everyone has been fed without making a mess."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date:</FormLabel>
+                  <FormControl>
+                    <DatePicker value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time:</FormLabel>
+                  <FormControl>
+                    <TimePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      use24Format={false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+          {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+        </Form>
 
         <Center>
           <DialogFooter className="flex-row">
@@ -145,7 +147,7 @@ function DialogAdd() {
             </Button>
           </DialogFooter>
         </Center>
-        </DialogContent>
+      </DialogContent>
     </Dialog>
   );
 }
