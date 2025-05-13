@@ -6,9 +6,15 @@ type VerifyOTP = {
   email: string;
   token: string;
   currentUrl: string;
+  tz: string;
 };
 
-export const verifyOTP = async ({ email, token, currentUrl }: VerifyOTP) => {
+export const verifyOTP = async ({
+  email,
+  token,
+  currentUrl,
+  tz,
+}: VerifyOTP) => {
   "use server";
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -47,8 +53,9 @@ export const verifyOTP = async ({ email, token, currentUrl }: VerifyOTP) => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, email")
+    .update({ timezone: tz })
     .eq("id", user.id)
+    .select("name, email")
     .single();
 
   const name = profile?.name;

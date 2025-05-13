@@ -58,6 +58,7 @@ export default function OtpForm({
         email,
         token,
         currentUrl: window.location.href,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       router.push(res.url);
     } catch (e) {
