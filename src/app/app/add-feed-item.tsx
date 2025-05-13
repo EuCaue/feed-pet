@@ -33,10 +33,11 @@ const feedItemSchema = z.object({
   date: z.date({ message: "Date is required." }),
   time: z.date({ message: "Time is required." }),
 });
+
 export default function DialogAdd() {
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
-    defaultValues: { description: "", date: undefined, time: undefined},
+    defaultValues: { description: "", date: undefined, time: undefined },
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [open, setOpen] = useState(false);
@@ -47,22 +48,22 @@ export default function DialogAdd() {
     time,
   }: z.infer<typeof feedItemSchema>) {
     try {
-      await addFeed({ description, date, time });
+      await addFeed({ description, date, time});
       form.reset();
       setOpen(false);
     } catch (err: unknown) {
       setErrorMessage(err.message);
     }
   }
-  const isLoading = form.formState.isSubmitting;
-function handleDialogOpenChange(isOpen: boolean) {
-  setOpen(isOpen);
-  if (isOpen) {
-    const now = new Date();
-    form.setValue("date", now);
-    form.setValue("time", now);
+  const isLoading = form.formState.isSubmitting || !form.formState.isDirty || form.formState.isLoading; 
+  function handleDialogOpenChange(isOpen: boolean) {
+    setOpen(isOpen);
+    if (isOpen) {
+      const now = new Date();
+      form.setValue("date", now);
+      form.setValue("time", now);
+    }
   }
-}
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
@@ -146,7 +147,6 @@ function handleDialogOpenChange(isOpen: boolean) {
                 Close
               </Button>
             </DialogClose>
-          {/*  TODO: disable the button when the form isnt touched or dirty  */}
             <Button type="submit" form="addForm" disabled={isLoading}>
               Save
             </Button>
