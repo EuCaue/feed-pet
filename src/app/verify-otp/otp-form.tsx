@@ -30,7 +30,6 @@ export default function OtpForm({
   email: string;
   errorMessage?: string;
 }) {
-  console.log("EMAIL:", email);
   const [otpValue, setOtpValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [resendOtp, setResendOtp] = useState(false);
@@ -70,7 +69,6 @@ export default function OtpForm({
 
   async function handleResendOTP() {
     setResendOtp(true);
-    console.log("reseding otp", email);
     try {
       await signIn({ email });
     } catch (error) {

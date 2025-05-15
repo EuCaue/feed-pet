@@ -1,6 +1,6 @@
 "use client";
-import { PlusIcon } from "lucide-react";
-import { addFeed } from "./actions";
+import { EditIcon, PlusIcon } from "lucide-react";
+import { addFeed, editFeed } from "./actions";
 import TimePicker from "@/components/time-picker";
 import DatePicker from "@/components/date-picker";
 import { useForm } from "react-hook-form";
@@ -34,10 +34,28 @@ const feedItemSchema = z.object({
   time: z.date({ message: "Time is required." }),
 });
 
-export default function DialogAdd() {
+type FeedItemProps = {
+  date?: Date;
+  time?: Date;
+  description?: string;
+  isEditing?: boolean;
+  id?: string;
+};
+
+export default function AddFeedItem({
+  date,
+  time,
+  description,
+  isEditing,
+  id,
+}: FeedItemProps) {
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
-    defaultValues: { description: "", date: undefined, time: undefined },
+    defaultValues: {
+      description: description ?? "",
+      date: date ?? new Date(),
+      time: time ?? new Date(),
+    },
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [open, setOpen] = useState(false);
@@ -48,17 +66,25 @@ export default function DialogAdd() {
     time,
   }: z.infer<typeof feedItemSchema>) {
     try {
-      await addFeed({ description, date, time});
+      if (isEditing && id) {
+        await editFeed({ description, date, time, id });
+      }
+      if (!isEditing) {
+        await addFeed({ description, date, time });
+      }
       form.reset();
       setOpen(false);
     } catch (err: unknown) {
       setErrorMessage(err.message);
     }
   }
-  const isLoading = form.formState.isSubmitting || !form.formState.isDirty || form.formState.isLoading; 
+  const isLoading =
+    form.formState.isSubmitting ||
+    !form.formState.isDirty ||
+    form.formState.isLoading;
   function handleDialogOpenChange(isOpen: boolean) {
     setOpen(isOpen);
-    if (isOpen) {
+    if (isOpen && !isEditing) {
       const now = new Date();
       form.setValue("date", now);
       form.setValue("time", now);
@@ -68,15 +94,17 @@ export default function DialogAdd() {
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <Button size="lg">
-          <PlusIcon />
+        <Button size={isEditing ? "icon" : "lg"}>
+          {isEditing ? <EditIcon /> : <PlusIcon />}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center">
-            Register the time you feed your pet!
+            {isEditing
+              ? "Edit the time your feeded your pet"
+              : "Register the time you feed your pet!"}
           </DialogTitle>
         </DialogHeader>
 
@@ -148,7 +176,7 @@ export default function DialogAdd() {
               </Button>
             </DialogClose>
             <Button type="submit" form="addForm" disabled={isLoading}>
-              Save
+              {isEditing ? "Edit" : "Save"}
             </Button>
           </DialogFooter>
         </Center>

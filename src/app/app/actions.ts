@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
 type FeedItem = {
-  date: string;
+  datetime: string;
   description: string;
   id: string;
   time: string;
@@ -16,10 +16,9 @@ type AddFeedItem = {
   description: string;
 };
 
-export async function addFeed({ description, date, time }: AddFeedItem) {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("User not found");
-  const supabase = createClient(await cookies());
+type EditFeedItem = AddFeedItem & { id: string };
+
+function combineDateAndTime(date: Date, time: Date): Date {
   const dateStr = date.toISOString().slice(0, 10);
   const timeStr = time.toTimeString().slice(0, 8);
   const timezoneOffset = new Date().getTimezoneOffset();
@@ -29,16 +28,54 @@ export async function addFeed({ description, date, time }: AddFeedItem) {
   ).padStart(2, "0");
   const offsetMinutes = String(Math.abs(timezoneOffset) % 60).padStart(2, "0");
   const offsetStr = `${sign}${offsetHours}:${offsetMinutes}`;
-
   const dateTimeWithOffset = `${dateStr}T${timeStr}${offsetStr}`;
-  const datetime: Date = new Date(dateTimeWithOffset);
+  return new Date(dateTimeWithOffset);
+}
 
+export async function deleteFeed(formData: FormData) {
+  "use server";
+  const user = await getCurrentUser();
+  if (!user) throw new Error("User not found");
+  const supabase = createClient(await cookies());
+  const id = formData.get("id");
+  const { error } = await supabase
+    .from("feed_history")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("id", id)
+    .select();
+  if (error) throw new Error(error.message);
+}
+
+export async function editFeed({ description, date, time, id }: EditFeedItem) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("User not found");
+  const supabase = createClient(await cookies());
+  const datetime: Date = combineDateAndTime(date, time);
   const payload = {
     description,
     datetime,
     user_id: user.id,
   };
-  const { data, error } = await supabase.from("feed_history").insert([payload]);
+  const { error } = await supabase
+    .from("feed_history")
+    .update([payload])
+    .eq("user_id", user.id)
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function addFeed({ description, date, time }: AddFeedItem) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("User not found");
+  const supabase = createClient(await cookies());
+  const datetime: Date = combineDateAndTime(date, time);
+  const payload = {
+    description,
+    datetime,
+    user_id: user.id,
+  };
+  const { error } = await supabase.from("feed_history").insert([payload]);
   if (error) throw new Error(error.message);
 }
 
@@ -82,6 +119,5 @@ export async function getFeeds(): Promise<Array<FeedItem>> {
       time: localTime,
     };
   });
-
   return feeds;
 }

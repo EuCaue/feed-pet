@@ -18,7 +18,6 @@ export default async function VerifyOtpPage({
   if (user) redirect("/app");
   const email = (await searchParams).email as string | undefined;
   const errorMessage = (await searchParams).message as string | undefined;
-  console.log("email", email);
 
   if (!email) {
     redirect("/");
