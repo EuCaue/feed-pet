@@ -7,9 +7,9 @@ type User = {
   id: string;
   is_12h: boolean;
   timezone: string;
-}
+};
 
-export default async function getCurrentUser() {
+export default async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const {
@@ -18,11 +18,17 @@ export default async function getCurrentUser() {
 
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("name, email, id, is_12h, timezone")
     .eq("id", user!.id)
     .single()
     .overrideTypes<User>();
+
+  if (error) {
+    console.error("Failed to fetch profile", error);
+    return null;
+  }
+
   return profile;
 }

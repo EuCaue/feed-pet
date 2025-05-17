@@ -32,8 +32,7 @@ function combineDateAndTime(date: Date, time: Date): Date {
   return new Date(dateTimeWithOffset);
 }
 
-export async function deleteFeed(formData: FormData) {
-  "use server";
+export async function deleteFeed(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = createClient(await cookies());
@@ -47,7 +46,7 @@ export async function deleteFeed(formData: FormData) {
   if (error) throw new Error(error.message);
 }
 
-export async function editFeed({ description, date, time, id }: EditFeedItem) {
+export async function editFeed({ description, date, time, id }: EditFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = createClient(await cookies());
@@ -65,7 +64,7 @@ export async function editFeed({ description, date, time, id }: EditFeedItem) {
   if (error) throw new Error(error.message);
 }
 
-export async function addFeed({ description, date, time }: AddFeedItem) {
+export async function addFeed({ description, date, time }: AddFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = createClient(await cookies());
