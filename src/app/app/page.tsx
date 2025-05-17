@@ -1,7 +1,7 @@
 import Center from "@/components/center";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { HistoryIcon } from "lucide-react";
+import { FrownIcon, HistoryIcon } from "lucide-react";
 import AddFeedItem from "./add-feed-item";
 import { getFeeds } from "./actions";
 import FeedItem from "./feed-item";
@@ -29,14 +29,18 @@ export default async function Page() {
                   key={item.id}
                 />
               );
-            })) || <Center>You have no records for today.</Center>}
+            })) || (
+            <Center className="gap-2 text-lg font-medium leading-relaxed">
+              You have no records for today. <FrownIcon />
+            </Center>
+          )}
         </CardContent>
       </Card>
 
       <CardFooter>
         <div className="absolute bottom-32 right-1/2 left-1/2 flex items-center justify-center gap-2 ">
           <AddFeedItem />
-          <Button size={"lg"} variant={"secondary"}>
+          <Button size={"lg"} variant={"secondary"} title="See your feed history">
             <HistoryIcon />
           </Button>
         </div>

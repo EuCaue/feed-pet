@@ -179,7 +179,7 @@ export default function AddFeedItem({
                 Close
               </Button>
             </DialogClose>
-            <Button type="submit" form="addForm" disabled={isLoading}>
+            <Button type="submit" form="addForm" disabled={isLoading} >
               {isEditing ? "Edit" : "Save"}
             </Button>
           </DialogFooter>
