@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { z } from "zod";
 import Center from "@/components/center";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const feedItemSchema = z.object({
@@ -72,7 +72,11 @@ export default function AddFeedItem({
       if (!isEditing) {
         await addFeed({ description, date, time });
       }
-      form.reset();
+      form.reset({
+        description: description ?? "",
+        date: date ?? new Date(),
+        time: time ?? new Date(),
+      });
       setOpen(false);
     } catch (err: unknown) {
       setErrorMessage(err.message);
