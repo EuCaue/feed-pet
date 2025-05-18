@@ -7,30 +7,15 @@ type FeedItem = {
   datetime: string;
   description: string;
   id: string;
-  time: string;
+  localTime: string;
 };
 
 type AddFeedItem = {
-  date: Date;
-  time: Date;
+  datetime: Date;
   description: string;
 };
 
 type EditFeedItem = AddFeedItem & { id: string };
-
-function combineDateAndTime(date: Date, time: Date): Date {
-  const dateStr = date.toISOString().slice(0, 10);
-  const timeStr = time.toTimeString().slice(0, 8);
-  const timezoneOffset = new Date().getTimezoneOffset();
-  const sign = timezoneOffset > 0 ? "-" : "+";
-  const offsetHours = String(
-    Math.floor(Math.abs(timezoneOffset) / 60),
-  ).padStart(2, "0");
-  const offsetMinutes = String(Math.abs(timezoneOffset) % 60).padStart(2, "0");
-  const offsetStr = `${sign}${offsetHours}:${offsetMinutes}`;
-  const dateTimeWithOffset = `${dateStr}T${timeStr}${offsetStr}`;
-  return new Date(dateTimeWithOffset);
-}
 
 export async function deleteFeed(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
@@ -46,11 +31,14 @@ export async function deleteFeed(formData: FormData): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-export async function editFeed({ description, date, time, id }: EditFeedItem): Promise<void> {
+export async function editFeed({
+  description,
+  datetime,
+  id,
+}: EditFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = createClient(await cookies());
-  const datetime: Date = combineDateAndTime(date, time);
   const payload = {
     description,
     datetime,
@@ -60,15 +48,18 @@ export async function editFeed({ description, date, time, id }: EditFeedItem): P
     .from("feed_history")
     .update([payload])
     .eq("user_id", user.id)
-    .eq("id", id);
+    .eq("id", id)
+    .select();
   if (error) throw new Error(error.message);
 }
 
-export async function addFeed({ description, date, time }: AddFeedItem): Promise<void> {
+export async function addFeed({
+  description,
+  datetime,
+}: AddFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = createClient(await cookies());
-  const datetime: Date = combineDateAndTime(date, time);
   const payload = {
     description,
     datetime,
@@ -115,7 +106,7 @@ export async function getFeeds(): Promise<Array<FeedItem>> {
 
     return {
       ...item,
-      time: localTime,
+      localTime,
     };
   });
   return feeds;

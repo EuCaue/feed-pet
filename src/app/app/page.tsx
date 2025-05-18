@@ -22,7 +22,7 @@ export default async function Page() {
             feeds.map((item) => {
               return (
                 <FeedItem
-                  time={item.time}
+                  localTime={item.localTime}
                   datetime={item.datetime}
                   description={item.description}
                   id={item.id}
@@ -40,7 +40,11 @@ export default async function Page() {
       <CardFooter>
         <div className="absolute bottom-32 right-1/2 left-1/2 flex items-center justify-center gap-2 ">
           <AddFeedItem />
-          <Button size={"lg"} variant={"secondary"} title="See your feed history">
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            title="See your feed history"
+          >
             <HistoryIcon />
           </Button>
         </div>

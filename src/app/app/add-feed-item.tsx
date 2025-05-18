@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { z } from "zod";
 import Center from "@/components/center";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const feedItemSchema = z.object({
@@ -35,16 +35,14 @@ const feedItemSchema = z.object({
 });
 
 type FeedItemProps = {
-  date?: Date;
-  time?: Date;
+  datetime?: Date;
   description?: string;
   isEditing?: boolean;
   id?: string;
 };
 
 export default function AddFeedItem({
-  date,
-  time,
+  datetime,
   description,
   isEditing,
   id,
@@ -53,8 +51,8 @@ export default function AddFeedItem({
     resolver: zodResolver(feedItemSchema),
     defaultValues: {
       description: description ?? "",
-      date: date ?? new Date(),
-      time: time ?? new Date(),
+      date: datetime ?? new Date(),
+      time: datetime ?? new Date(),
     },
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -65,17 +63,24 @@ export default function AddFeedItem({
     date,
     time,
   }: z.infer<typeof feedItemSchema>) {
+    date.setHours(
+      time.getHours(),
+      time.getMinutes(),
+      time.getSeconds(),
+      time.getMilliseconds(),
+    );
+    const datetime = date;
     try {
       if (isEditing && id) {
-        await editFeed({ description, date, time, id });
+        await editFeed({ description, datetime, id });
       }
       if (!isEditing) {
-        await addFeed({ description, date, time });
+        await addFeed({ description, datetime });
       }
       form.reset({
-        description: description ?? "",
-        date: date ?? new Date(),
-        time: time ?? new Date(),
+        description: "",
+        date: new Date(),
+        time: new Date(),
       });
       setOpen(false);
     } catch (err: unknown) {
@@ -179,7 +184,7 @@ export default function AddFeedItem({
                 Close
               </Button>
             </DialogClose>
-            <Button type="submit" form="addForm" disabled={isLoading} >
+            <Button type="submit" form="addForm" disabled={isLoading}>
               {isEditing ? "Edit" : "Save"}
             </Button>
           </DialogFooter>
