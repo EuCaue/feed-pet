@@ -39,7 +39,7 @@ export default async function Page() {
 
       <CardFooter>
         <div className="absolute bottom-32 right-1/2 left-1/2 flex items-center justify-center gap-2 ">
-          <AddFeedItem />
+          <AddFeedItem use12Format={user.is_12h} />
           <Button
             size={"lg"}
             variant={"secondary"}

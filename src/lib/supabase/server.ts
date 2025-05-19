@@ -16,7 +16,7 @@ export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) =
               cookieStore.set(name, value, options),
             );
           } catch (e){
-            console.log("from createserveeclient",e)
+            console.error("from createserveeclient",e)
           }
         },
       },

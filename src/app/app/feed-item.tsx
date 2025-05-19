@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { deleteFeed } from "./actions";
+import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 
 type FeedItemProps = {
   localTime: string;
@@ -81,13 +82,14 @@ function DeleteFeedItem({ id }: DeleteFeedItemProps) {
   );
 }
 
-export default function FeedItem({
+export default async function FeedItem({
   datetime,
   localTime,
   description,
   id,
 }: FeedItemProps) {
   const d = new Date(datetime);
+  const user = await getCurrentUser();
   return (
     <Center className="justify-between border-3 border-accent-foreground rounded-[12px] w-full bg-secondary">
       <div className="ml-4 uppercase mr-4">{localTime}</div>
@@ -102,7 +104,13 @@ export default function FeedItem({
       </div>
 
       <Center className="bg-muted-foreground rounded-br-[11px] rounded-tr-[11px] min-h-[120px] min-w-[5ch] md:min-w-[120px] flex-col md:flex-row gap-2">
-        <AddFeedItem datetime={d} description={description} id={id} isEditing />
+        <AddFeedItem
+          use12Format={user!.is_12h}
+          datetime={d}
+          description={description}
+          id={id}
+          isEditing
+        />
         <DeleteFeedItem id={id ?? ""} />
       </Center>
     </Center>

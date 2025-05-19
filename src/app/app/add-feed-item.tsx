@@ -39,6 +39,7 @@ type FeedItemProps = {
   description?: string;
   isEditing?: boolean;
   id?: string;
+  use12Format: boolean;
 };
 
 export default function AddFeedItem({
@@ -46,6 +47,7 @@ export default function AddFeedItem({
   description,
   isEditing,
   id,
+  use12Format,
 }: FeedItemProps) {
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
@@ -162,7 +164,7 @@ export default function AddFeedItem({
                     <TimePicker
                       value={field.value}
                       onChange={field.onChange}
-                      use24Format={false}
+                      use12Format={use12Format}
                     />
                   </FormControl>
                   <FormMessage />

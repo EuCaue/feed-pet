@@ -21,6 +21,7 @@ import { Loading } from "@/components/loading";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import Center from "@/components/center";
+import { updateUserProfile } from "@/lib/actions/update-user-profile";
 
 const accountSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -73,7 +74,7 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
     if (!name) return;
     setIsLoading(true);
     setBackendResponse(DEFAULT_BACKEND_RESPONSE);
-    const result = await saveAccountSettings({ email, name, is_12h });
+    const result = await updateUserProfile({ email, name, is_12h });
     setBackendResponse({
       hasError: !result.success,
       message: result.message,
@@ -139,9 +140,10 @@ export default function ClientAccountForm({ user }: ClientAccountFormProps) {
                 <Center className="gap-4">
                   <span className="">12h</span>
                   <Switch
-                    checked={field.value}
+                    checked={field.value === true ? false  : true}
                     onCheckedChange={(checked) => {
-                      form.setValue("is_12h", checked, {
+                      const value = !checked;
+                      form.setValue("is_12h", value, {
                         shouldDirty: true,
                         shouldValidate: true,
                         shouldTouch: true,

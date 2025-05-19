@@ -1,20 +1,15 @@
 "use server";
-
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
-type SaveAccountSettingsReturn = {
-  success: boolean;
-  message: string;
+type UserProfileData = {
+  name?: string;
+  email?: string;
+  is_12h?: boolean;
 };
 
-export async function saveAccountSettings(data: {
-  name: string;
-  email: string;
-  is_12h: boolean;
-}): Promise<SaveAccountSettingsReturn> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+export async function updateUserProfile(data: UserProfileData) {
+  const supabase = createClient(await cookies());
 
   const {
     data: { user },
@@ -27,7 +22,6 @@ export async function saveAccountSettings(data: {
       message: "User not found.",
     };
   }
-
   if (user.email !== data.email) {
     const { error: authError } = await supabase.auth.updateUser({
       email: data.email,
@@ -41,10 +35,10 @@ export async function saveAccountSettings(data: {
       };
     }
   }
-
+  const fieldsToUpdate = Object.keys(data).join(", ");
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, email, is_12h")
+    .select(fieldsToUpdate)
     .eq("id", user.id)
     .single();
 
@@ -62,7 +56,7 @@ export async function saveAccountSettings(data: {
       .eq("id", user.id);
 
     if (profileError) {
-      console.log("PROFILE ERR", profileError);
+      console.error("PROFILE ERR", profileError);
       return {
         success: false,
         message: "Error while updating profile.",

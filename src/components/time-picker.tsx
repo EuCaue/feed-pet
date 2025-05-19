@@ -21,22 +21,23 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useEffect, useMemo, useState } from "react";
+import { updateUserProfile } from "@/lib/actions/update-user-profile";
 
 type TimePickerProps = {
   className?: string;
   value?: Date;
   onChange?: (date: Date | undefined) => void;
-  use24Format: boolean;
+  use12Format: boolean;
 };
 
 export default function TimePicker({
   className,
   value,
   onChange,
-  use24Format,
+  use12Format,
 }: TimePickerProps) {
   const [time, setTime] = useState<Date | undefined>(value);
-  const [is24Hour, setIs24Hour] = useState(use24Format);
+  const [is12hour, setIs12Hour] = useState(use12Format);
   const [open, setOpen] = useState(false);
 
   // Update internal state when value prop changes
@@ -47,11 +48,13 @@ export default function TimePicker({
   }, [value]);
 
   const hours = useMemo(() => {
-    if (is24Hour) {
-      return Array.from({ length: 24 }, (_, i) => i);
+    if (is12hour) {
+      return Array.from({ length: 12 }, (_, i) => (i === 0 ? 12 : i)).toSorted(
+        (a, b) => b - a,
+      );
     }
-    return Array.from({ length: 12 }, (_, i) => (i === 0 ? 12 : i));
-  }, [is24Hour]);
+    return Array.from({ length: 24 }, (_, i) => i).toSorted((a, b) => b - a);
+  }, [is12hour]);
 
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
@@ -59,9 +62,9 @@ export default function TimePicker({
     const newTime = time ? new Date(time) : new Date();
     let hour = Number.parseInt(value, 10);
 
-    if (!is24Hour && time && getAmPm(time) === "PM" && hour !== 12) {
+    if (is12hour && time && getAmPm(time) === "PM" && hour !== 12) {
       hour += 12;
-    } else if (!is24Hour && time && getAmPm(time) === "AM" && hour === 12) {
+    } else if (is12hour && time && getAmPm(time) === "AM" && hour === 12) {
       hour = 0;
     }
 
@@ -100,21 +103,21 @@ export default function TimePicker({
   };
 
   const getFormattedTime = (date: Date) => {
-    if (is24Hour) {
-      return format(date, "HH:mm");
+    if (is12hour) {
+      return format(date, "hh:mm a");
     }
-    return format(date, "hh:mm a");
+    return format(date, "HH:mm");
   };
 
   const getCurrentHour = () => {
     if (!time) return "";
 
-    if (is24Hour) {
-      return time.getHours().toString();
+    if (is12hour) {
+      const hour = time.getHours() % 12;
+      return (hour === 0 ? 12 : hour).toString();
     }
 
-    const hour = time.getHours() % 12;
-    return (hour === 0 ? 12 : hour).toString();
+    return time.getHours().toString();
   };
 
   const getCurrentMinute = () => {
@@ -125,6 +128,15 @@ export default function TimePicker({
   const getCurrentAmPm = () => {
     if (!time) return "AM";
     return getAmPm(time);
+  };
+
+  const handleCheckedChange = async (checked: boolean) => {
+    setIs12Hour(checked);
+    try {
+      await updateUserProfile({ is_12h: checked });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -145,11 +157,11 @@ export default function TimePicker({
       <PopoverContent className="w-auto p-4">
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="24-hour-mode">24-hour mode</Label>
+            <Label htmlFor="12-hour-mode">12-hour mode</Label>
             <Switch
-              id="24-hour-mode"
-              checked={is24Hour}
-              onCheckedChange={setIs24Hour}
+              id="12-hour-mode"
+              checked={is12hour}
+              onCheckedChange={handleCheckedChange}
             />
           </div>
 
@@ -161,7 +173,7 @@ export default function TimePicker({
               <SelectContent>
                 {hours.map((hour) => (
                   <SelectItem key={hour} value={hour.toString()}>
-                    {is24Hour ? hour.toString().padStart(2, "0") : hour}
+                    {is12hour ? hour.toString().padStart(2, "0") : hour}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -176,14 +188,17 @@ export default function TimePicker({
               </SelectTrigger>
               <SelectContent>
                 {minutes.map((minute) => (
-                  <SelectItem key={minute} value={minute.toString().padStart(2, "0")}>
+                  <SelectItem
+                    key={minute}
+                    value={minute.toString().padStart(2, "0")}
+                  >
                     {minute.toString().padStart(2, "0")}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {!is24Hour && (
+            {is12hour && (
               <Select value={getCurrentAmPm()} onValueChange={handleAmPmChange}>
                 <SelectTrigger className="w-[80px]">
                   <SelectValue placeholder="AM/PM" />
