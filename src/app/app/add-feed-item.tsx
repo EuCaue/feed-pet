@@ -27,6 +27,7 @@ import { z } from "zod";
 import Center from "@/components/center";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useCurrentUser } from "@/lib/supabase/queries/use-current-user";
 
 const feedItemSchema = z.object({
   description: z.string().min(1, "Description is required."),
@@ -39,7 +40,6 @@ type FeedItemProps = {
   description?: string;
   isEditing?: boolean;
   id?: string;
-  use12Format: boolean;
 };
 
 export default function AddFeedItem({
@@ -47,8 +47,9 @@ export default function AddFeedItem({
   description,
   isEditing,
   id,
-  use12Format,
 }: FeedItemProps) {
+  const { user} = useCurrentUser();
+  const use12Format = Boolean(user!.is_12h)
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
     defaultValues: {

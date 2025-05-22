@@ -23,7 +23,6 @@ export default async function Page() {
               datetime={item.datetime}
               description={item.description}
               id={item.id}
-              use12Format={user.is_12h}
               key={item.id}
             />
           ))
@@ -34,7 +33,7 @@ export default async function Page() {
         )}
       </CardContent>
       <div className="absolute bottom-[177px] left-0 right-0 w-full z-10 flex items-center justify-center">
-        <AddFeedItem use12Format={user.is_12h} />
+        <AddFeedItem />
       </div>
     </>
   );

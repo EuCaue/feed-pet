@@ -28,7 +28,6 @@ function DayItem({ date, dayFeeds }: CalenderItemProps) {
   const day = date.getDate();
   const month = date.getMonth().toString().padStart(2, "0");
   const year = date.getFullYear();
-  const { user, loading } = useCurrentUser();
   return (
     <Dialog>
       <DialogTrigger>{date.getDate()}</DialogTrigger>
@@ -41,17 +40,15 @@ function DayItem({ date, dayFeeds }: CalenderItemProps) {
           </DialogTitle>
         </DialogHeader>
 
-        {!loading &&
-          dayFeeds.map((item) => (
-            <FeedItem
-              use12Format={user!.is_12h}
-              key={item.id}
-              localTime={item.localTime}
-              datetime={item.datetime}
-              description={item.description}
-              id={item.id}
-            />
-          ))}
+        {dayFeeds.map((item) => (
+          <FeedItem
+            key={item.id}
+            localTime={item.localTime}
+            datetime={item.datetime}
+            description={item.description}
+            id={item.id}
+          />
+        ))}
       </DialogContent>
     </Dialog>
   );

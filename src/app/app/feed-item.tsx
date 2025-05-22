@@ -8,7 +8,6 @@ type FeedItemProps = {
   description: string;
   datetime: string;
   id?: string;
-  use12Format: boolean;
 };
 
 export default function FeedItem({
@@ -16,9 +15,9 @@ export default function FeedItem({
   localTime,
   description,
   id,
-  use12Format,
 }: FeedItemProps) {
   const d = new Date(datetime);
+
   return (
     <Center className="justify-between border-3 border-accent-foreground rounded-[12px] w-full bg-secondary">
       <div className="ml-4 uppercase mr-4">{localTime}</div>
@@ -34,7 +33,6 @@ export default function FeedItem({
 
       <Center className="bg-muted-foreground rounded-br-[11px] rounded-tr-[11px] min-h-[120px] min-w-[5ch] md:min-w-[120px] flex-col md:flex-row gap-2">
         <AddFeedItem
-          use12Format={use12Format}
           datetime={d}
           description={description}
           id={id}
