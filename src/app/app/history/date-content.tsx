@@ -1,0 +1,80 @@
+"use client";
+import { ActiveModifiers } from "react-day-picker";
+import type { FeedItem as IFeedItem } from "../actions";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import FeedItem from "../feed-item";
+import Center from "@/components/center";
+import { useCurrentUser } from "@/lib/supabase/queries/use-current-user";
+
+type DayContentProps = {
+  date: Date;
+  activeModifiers: ActiveModifiers;
+  dayFeeds: Array<IFeedItem>;
+};
+
+type CalenderItemProps = {
+  date: Date;
+  dayFeeds: Array<IFeedItem>;
+};
+
+function DayItem({ date, dayFeeds }: CalenderItemProps) {
+  const day = date.getDate();
+  const month = date.getMonth().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const { user, loading } = useCurrentUser();
+  return (
+    <Dialog>
+      <DialogTrigger>{date.getDate()}</DialogTrigger>
+      <DialogContent className="overflow-y-scroll max-h-1/2">
+        <DialogHeader>
+          <DialogTitle>
+            <Center as="p">
+              History of Day: {day}/{month}/{year}
+            </Center>
+          </DialogTitle>
+        </DialogHeader>
+
+        {!loading &&
+          dayFeeds.map((item) => (
+            <FeedItem
+              use12Format={user!.is_12h}
+              key={item.id}
+              localTime={item.localTime}
+              datetime={item.datetime}
+              description={item.description}
+              id={item.id}
+            />
+          ))}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default function DayContent({
+  date,
+  activeModifiers,
+  dayFeeds,
+}: DayContentProps) {
+  const isWithDot = activeModifiers.withDot;
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <div>
+        {isWithDot ? (
+          <DayItem dayFeeds={dayFeeds} date={date} />
+        ) : (
+          date.getDate()
+        )}
+      </div>
+      {isWithDot && (
+        <div className="w-1.5 h-1.5 rounded-full bg-accent-foreground mt-0.5" />
+      )}
+    </div>
+  );
+}
