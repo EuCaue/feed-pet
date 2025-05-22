@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import FeedItem from "../feed-item";
 import Center from "@/components/center";
-import { useCurrentUser } from "@/lib/supabase/queries/use-current-user";
 
 type DayContentProps = {
   date: Date;
@@ -35,7 +34,7 @@ function DayItem({ date, dayFeeds }: CalenderItemProps) {
         <DialogHeader>
           <DialogTitle>
             <Center as="p">
-              History of Day: {day}/{month}/{year}
+              History for {day}/{month}/{year}
             </Center>
           </DialogTitle>
         </DialogHeader>

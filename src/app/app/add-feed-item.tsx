@@ -48,8 +48,7 @@ export default function AddFeedItem({
   isEditing,
   id,
 }: FeedItemProps) {
-  const { user} = useCurrentUser();
-  const use12Format = Boolean(user!.is_12h)
+  const { user, loading } = useCurrentUser();
   const form = useForm({
     resolver: zodResolver(feedItemSchema),
     defaultValues: {
@@ -60,6 +59,13 @@ export default function AddFeedItem({
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [open, setOpen] = useState(false);
+  if (loading || !user)
+    return (
+      <Button size={isEditing ? "icon" : "lg"}>
+        {isEditing ? <EditIcon /> : <PlusIcon />}
+      </Button>
+    );
+  const use12Format = user.is_12h;
 
   async function onSubmit({
     description,
