@@ -3,7 +3,7 @@ import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
-type FeedItem = {
+export type FeedItem = {
   datetime: string;
   description: string;
   id: string;
