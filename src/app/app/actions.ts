@@ -1,7 +1,7 @@
 "use server";
 import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export type FeedItem = {
   datetime: string;
@@ -29,6 +29,7 @@ export async function deleteFeed(formData: FormData): Promise<void> {
     .eq("id", id)
     .select();
   if (error) throw new Error(error.message);
+  revalidatePath("/app");
 }
 
 export async function editFeed({
@@ -51,12 +52,14 @@ export async function editFeed({
     .eq("id", id)
     .select();
   if (error) throw new Error(error.message);
+  revalidatePath("/app");
 }
 
 export async function addFeed({
   description,
   datetime,
 }: AddFeedItem): Promise<void> {
+  console.log(description, datetime);
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = await createClient();
@@ -67,6 +70,7 @@ export async function addFeed({
   };
   const { error } = await supabase.from("feed_history").insert([payload]);
   if (error) throw new Error(error.message);
+  revalidatePath("/app");
 }
 
 export async function getFeeds(): Promise<Array<FeedItem>> {

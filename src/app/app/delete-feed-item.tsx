@@ -41,6 +41,7 @@ export default function DeleteFeedItem({ id }: DeleteFeedItemProps) {
               value={id}
               style={{ display: "none" }}
               name="id"
+              readOnly
               aria-hidden
             />
           </form>
