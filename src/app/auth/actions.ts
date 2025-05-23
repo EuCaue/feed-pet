@@ -10,7 +10,7 @@ export const signIn = async ({ email }: { email: string }) => {
   });
 
   if (error) {
-
+    console.error("sign error =>", error);
     return {
       success: false,
       message: "Could not authenticate user",

@@ -9,10 +9,14 @@ import OtpForm from "./otp-form"; // agora isolado
 import { redirect } from "next/navigation";
 import getCurrentUser from "@/lib/supabase/queries/get-current-user";
 
+type SearchParams = {
+  [key: string]: string | string[] | undefined;
+};
+
 export default async function VerifyOtpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<SearchParams>;
 }) {
   const user = await getCurrentUser();
   if (user) redirect("/app");
