@@ -37,16 +37,21 @@ export default function OtpForm({
   const router = useRouter();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev === 0) {
-          clearInterval(interval);
-          setResendOtp(false);
-          return INITIAL_RESEND_OTP_TIME;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    let interval: NodeJS.Timeout;
+
+    if (resendOtp) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev === 1) {
+            clearInterval(interval);
+            setResendOtp(false);
+            return INITIAL_RESEND_OTP_TIME;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
     return () => clearInterval(interval);
   }, [resendOtp]);
 
