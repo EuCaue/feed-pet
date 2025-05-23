@@ -1,12 +1,9 @@
 "use server";
-
-import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export const signIn = async ({ email }: { email: string }) => {
   "use server";
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithOtp({
     email,

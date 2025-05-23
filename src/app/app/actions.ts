@@ -20,7 +20,7 @@ type EditFeedItem = AddFeedItem & { id: string };
 export async function deleteFeed(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
   const id = formData.get("id");
   const { error } = await supabase
     .from("feed_history")
@@ -38,7 +38,7 @@ export async function editFeed({
 }: EditFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
   const payload = {
     description,
     datetime,
@@ -59,7 +59,7 @@ export async function addFeed({
 }: AddFeedItem): Promise<void> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
   const payload = {
     description,
     datetime,
@@ -73,7 +73,7 @@ export async function getFeeds(): Promise<Array<FeedItem>> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
 
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
   const tz = user.timezone || "America/Sao_Paulo";
   const now = new Date();
   const startOfDayLocal = new Date(

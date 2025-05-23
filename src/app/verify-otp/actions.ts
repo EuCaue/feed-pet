@@ -16,8 +16,7 @@ export const verifyOTP = async ({
   tz,
 }: VerifyOTP) => {
   "use server";
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.verifyOtp({
     email,

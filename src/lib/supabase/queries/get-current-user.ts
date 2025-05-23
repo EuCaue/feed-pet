@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+"use server"
 import { createClient } from "@/lib/supabase/server";
 
 type User = {
@@ -10,8 +10,7 @@ type User = {
 };
 
 export default async function getCurrentUser(): Promise<User | null> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

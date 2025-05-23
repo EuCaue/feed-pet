@@ -1,6 +1,5 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
 
 type UserProfileData = {
   name?: string;
@@ -9,7 +8,7 @@ type UserProfileData = {
 };
 
 export async function updateUserProfile(data: UserProfileData) {
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
 
   const {
     data: { user },

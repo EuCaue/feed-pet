@@ -1,5 +1,4 @@
 import getCurrentUser from "@/lib/supabase/queries/get-current-user";
-import { cookies } from "next/headers";
 import { FeedItem } from "../actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -7,7 +6,7 @@ export async function getAllFeeds(): Promise<Array<FeedItem>> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
 
-  const supabase = createClient(await cookies());
+  const supabase = await createClient();
   const tz = user.timezone || "America/Sao_Paulo";
 
   const { data, error } = await supabase
