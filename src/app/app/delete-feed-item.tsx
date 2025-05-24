@@ -26,7 +26,8 @@ export default function DeleteFeedItem({ id }: DeleteFeedItemProps) {
             <TrashIcon />
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="w-sm">
+          <Center>
           <DialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>This action cannot be undone.</DialogDescription>
@@ -45,12 +46,12 @@ export default function DeleteFeedItem({ id }: DeleteFeedItemProps) {
               aria-hidden
             />
           </form>
+          </Center>
           <DialogFooter>
             <Center className="gap-4 m-auto">
               <DialogClose asChild>
                 <Button
                   type="button"
-                  form="delete-feed-item"
                   variant={"secondary"}
                 >
                   Cancel

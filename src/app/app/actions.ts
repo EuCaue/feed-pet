@@ -59,7 +59,6 @@ export async function addFeed({
   description,
   datetime,
 }: AddFeedItem): Promise<void> {
-  console.log(description, datetime);
   const user = await getCurrentUser();
   if (!user) throw new Error("User not found");
   const supabase = await createClient();

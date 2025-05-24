@@ -18,12 +18,20 @@ type HeaderMenuProps = {
 
 function Greeting({ username }: { username?: string }) {
   return (
-    <p className="font-bold font-mono leading-loose text-sm">
-      Hey,
-      <Button asChild type="button" variant={"link"} size={"sm"}>
-        <Link href={username ? "/account-settings" : "/"}>{username}</Link>
+    <p className="text-sm text-center text-muted-foreground leading-relaxed">
+      <span className="font-semibold text-foreground">Hey</span>
+      {", "}
+      <Button
+        asChild
+        variant="link"
+        size="sm"
+        className="p-0 h-auto font-semibold truncate text-primary"
+      >
+        <Link href={username ? "/account-settings" : "/"}>
+          {username ?? "guest"}
+        </Link>
       </Button>
-      how it&apos;s going today?
+      {", how's it going today?"}
     </p>
   );
 }
@@ -68,13 +76,11 @@ export default async function HeaderMenu({
           <DropdownMenuTrigger>
             <MenuIcon />
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <div className="flex items-center justify-between flex-col min-h-fit p-4">
-              <Greeting username={username} />
-              <span className="flex gap-2">
-                <Items isLoggedIn={isLoggedIn} />
-              </span>
+          <DropdownMenuContent className="w-72 flex flex-col items-center p-4 gap-6">
+            <div className="flex gap-2 justify-center">
+              <Items isLoggedIn={isLoggedIn} />
             </div>
+            <Greeting username={username} />
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
