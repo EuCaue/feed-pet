@@ -1,6 +1,6 @@
 # 🐾 Feed Pet
 
-Feed Pet is a simple web application built with **Next.js** and **shadcn/ui** to solve a personal need: keeping track of when the pets has been feed. This app was designed to avoid confusion at home and ensure our furry friends are always taken care of.
+**Feed Pet** is a simple web application built with **Next.js** and **shadcn/ui** to solve a personal need: keeping track of when the pets were last fed. This app was designed to avoid confusion at home and ensure our furry friends are always taken care of on time.
 
 ## 🚀 Features
 
