@@ -93,7 +93,11 @@ export default function AddFeedItem({
       });
       setOpen(false);
     } catch (err: unknown) {
-      setErrorMessage(err.message);
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
   }
   const isLoading =
