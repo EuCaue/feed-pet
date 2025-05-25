@@ -79,21 +79,37 @@ export async function getFeeds(): Promise<Array<FeedItem>> {
   const supabase = await createClient();
   const tz = user.timezone || "America/Sao_Paulo";
   const now = new Date();
-  const startOfDayLocal = new Date(
-    now.toLocaleString("en-US", { timeZone: tz }).split(",")[0] + " 00:00:00",
-  );
-  const endOfDayLocal = new Date(
-    now.toLocaleString("en-US", { timeZone: tz }).split(",")[0] + " 23:59:59",
-  );
-  const startUtc = startOfDayLocal.toISOString();
-  const endUtc = endOfDayLocal.toISOString();
+
+  const startOfDayUTC = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      0,
+      0,
+      0,
+      0,
+    ),
+  ).toISOString();
+
+  const endOfDayUTC = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      23,
+      59,
+      59,
+      999,
+    ),
+  ).toISOString();
 
   const { data, error } = await supabase
     .from("feed_history")
     .select("*")
     .eq("user_id", user.id)
-    .gte("datetime", startUtc)
-    .lte("datetime", endUtc)
+    .gte("datetime", startOfDayUTC)
+    .lte("datetime", endOfDayUTC)
     .order("datetime", { ascending: true })
     .overrideTypes<Array<FeedItem>>();
 
