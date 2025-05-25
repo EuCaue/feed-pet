@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
-import { saveAccountSettings } from "./actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loading } from "@/components/loading";
